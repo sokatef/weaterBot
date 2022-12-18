@@ -1,16 +1,19 @@
-# This is a sample Python script.
+import requests
+from config import weatherApiTpken
+from config import weatherApiEndpoint
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+def getCurrentWeater(city):
+    queryParams={"key": weatherApiTpken, "q": city}
+    currentWeaterResponse=requests.get(weatherApiEndpoint+'current.json',queryParams)
+
+    if currentWeaterResponse.status_code==200:
+        return ( {"city":currentWeaterResponse.json()['location']['name'],"localTime":  currentWeaterResponse.json()['location']['localtime'],
+            "currentTemperature": currentWeaterResponse.json()['current']['temp_c'], "windSpeed": currentWeaterResponse.json()['current']['wind_kph'],
+            "windDirection": currentWeaterResponse.json()['current']['wind_dir'] , "airHumidity": currentWeaterResponse.json()['current']['humidity']})
+    #Температура в градусах Цельсия. Скорость ветра в км/ч. Сам enum ветров тут https://www.surfertoday.com/windsurfing/how-to-read-wind-direction
+    else:
+        if (currentWeaterResponse.status_code==400 and currentWeaterResponse.json()['error']['code']=='406'):
+            return 'Invalid location'
+        else: return 'Bad request'
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
